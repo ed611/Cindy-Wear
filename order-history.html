@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  <title>Order History - Cindy Wear</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f7f7f7;
+    }
+    h2 {
+      text-align: center;
+      margin-top: 130px;
+    }
+    .order {
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+    .order h3 {
+      margin: 0 0 8px;
+      font-size: 16px;
+      color: #333;
+    }
+    .order p {
+      margin: 4px 0;
+      font-size: 14px;
+      color: #555;
+    }
+    .items {
+      display: flex;
+      flex-direction: column;
+      margin-top: 10px;
+    }
+    .item {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+      align-items: center;
+      border-top: 1px solid #eee;
+      padding-top: 10px;
+    }
+    .item img {
+      width: 60px;
+      height: 60px;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+    .item-details {
+      font-size: 13px;
+    }
+    .no-orders {
+      text-align: center;
+      color: #999;
+      font-size: 14px;
+    }
+    #toast {
+      visibility: hidden;
+      background-color: #4BB543;
+      color: white;
+      padding: 12px 20px;
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-radius: 8px;
+      font-size: 15px;
+      z-index: 9999;
+      max-width: 90%;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    .clear-btn {
+      display: block;
+      margin: 20px auto;
+      padding: 10px 16px;
+      background-color: #e74c3c;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    #customConfirm {
+      display: none;
+      position: fixed;
+      z-index: 10000;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+    }
+    #customConfirmBox {
+      background: #fff;
+      padding: 20px;
+      max-width: 300px;
+      margin: 30% auto;
+      border-radius: 12px;
+      text-align: center;
+    }
+    #customConfirmBox button {
+      margin: 10px;
+      padding: 8px 14px;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      cursor: pointer;
+    }
+    #customConfirmBox .yes {
+      background: #e74c3c;
+    }
+    #customConfirmBox .no {
+      background: #777;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="navbar">
+    <div class="logo">
+      <a href="Index.html"><img style="border-radius: 100px;" src="images/cindy logo-01.png" width="100px" height="100px"></a>
+    </div>
+    <nav>
+      <ul id="MenuItems">
+        <li><a href="Index.html">Home</a></li>
+        <li><a href="product details.html">Women</a></li>
+        <li><a href="#">Kids</a></li>
+        <li><a href="order-history.html">Order History</a></li>
+        <li><a href="contact.html">Contact Us</a></li>
+      </ul>
+    </nav>
+    <a href="cart.html"><img src="images/shopping-cart.png" width="15px" height="20px" style="margin-left: 20px;"></a>
+    <img src="images/menu.jfif" class="menu-icon" onclick="menutoggle()">
+  </div>
+</div>
+
+<h2>📝 Your Order History</h2>
+<button class="clear-btn" onclick="clearOrderHistory()">🗑️ Clear Order History</button>
+<div id="orderContainer"></div>
+<div id="toast"></div>
+
+<!-- Custom Confirmation Modal -->
+<div id="customConfirm">
+  <div id="customConfirmBox">
+    <p style="font-size: 15px; color: #333;">Are you sure you want to clear your entire order history?</p>
+    <button class="yes" onclick="confirmClearHistory(true)">Yes</button>
+    <button class="no" onclick="confirmClearHistory(false)">No</button>
+  </div>
+</div>
+
+<script>
+  function menutoggle() {
+    const menu = document.getElementById("MenuItems");
+    if (menu.style.maxHeight === "0px") {
+      menu.style.maxHeight = "500px";
+    } else {
+      menu.style.maxHeight = "0px";
+    }
+  }
+
+  const orderContainer = document.getElementById("orderContainer");
+  const history = JSON.parse(localStorage.getItem("orderHistory")) || [];
+
+  if (history.length === 0) {
+    orderContainer.innerHTML = '<p class="no-orders">No orders found.</p>';
+  } else {
+    history.reverse().forEach(order => {
+      const div = document.createElement("div");
+      div.className = "order";
+      div.innerHTML = `
+        <h3>Order on ${order.date}</h3>
+        <p><strong>Name:</strong> ${order.customer.name}</p>
+        <p><strong>Location:</strong> ${order.customer.estate}, ${order.customer.landmark}, ${order.customer.county}</p>
+        <p><strong>Phone:</strong> ${order.customer.phone}</p>
+        <p><strong>Payment:</strong> ${order.customer.payment}</p>
+        <p><strong>Total:</strong> KES ${order.total}</p>
+        <div class="items">
+          ${order.items.map(item => `
+            <div class="item">
+              <img src="${item.image}" alt="${item.name}" />
+              <div class="item-details">
+                <strong>${item.name}</strong><br>
+                Size: ${item.size}<br>
+                Qty: ${item.quantity}<br>
+                Price: KES ${item.price}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      orderContainer.appendChild(div);
+    });
+  }
+
+  function clearOrderHistory() {
+    document.getElementById("customConfirm").style.display = "block";
+  }
+
+  function confirmClearHistory(confirmed) {
+    document.getElementById("customConfirm").style.display = "none";
+    if (confirmed) {
+      localStorage.removeItem("orderHistory");
+      orderContainer.innerHTML = "<p class='no-orders'>Order history cleared.</p>";
+      showToast("🧹 Order history cleared successfully");
+    }
+  }
+
+  function showToast(message) {
+    const toast = document.getElementById("toast");
+    toast.textContent = message;
+    toast.style.visibility = "visible";
+    setTimeout(() => {
+      toast.style.visibility = "hidden";
+    }, 3000);
+  }
+</script>
+</body>
+</html>

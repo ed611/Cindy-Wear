@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Checkout - Cindy Wear</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    /* Styling trimmed for brevity – assume your existing styles here */
+    body.modal-open { overflow: hidden; }
+    #blur-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      backdrop-filter: blur(5px);
+      background: rgba(255, 255, 255, 0.5);
+      z-index: 999;
+      display: none;
+    }
+    #summaryPreview {
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1000;
+      background: #fff;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+      max-width: 95%; width: 90%;
+      max-height: 90%;
+      overflow-y: auto;
+      display: none;
+    }
+    #toast {
+      visibility: hidden;
+      background-color: #4BB543;
+      color: white;
+      padding: 10px 16px;
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-radius: 5px;
+      font-size: 14px;
+      z-index: 9999;
+    }
+   /* === Checkout Canvas Styling === */
+
+#summaryPreview {
+  display: none;
+  margin-top: 30px;
+  text-align: center;
+}
+
+#checkout-box {
+  margin: 0 auto;
+  width: 90%;
+  max-width: 400px;
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  text-align: left;
+}
+
+#checkout-box h4 {
+  margin-bottom: 10px;
+  font-size: 16px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 5px;
+}
+
+#previewItems {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 15px;
+}
+
+#previewItems .item {
+  display: flex;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  padding: 10px;
+  gap: 12px;
+  align-items: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  justify-content: flex-start;
+}
+
+#previewItems .item img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+#previewItems .info {
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: left;
+}
+
+#previewItems .info strong {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* === Canvas Preview After Download === */
+#summaryCanvas {
+  margin-top: 15px;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  max-width: 90%;
+}
+
+/* === Buttons === */
+.canvas-btns {
+  margin-top: 15px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.canvas-btns button {
+  padding: 8px 16px;
+  font-size: 14px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.btn-download {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.btn-download:hover {
+  background-color: #0056b3;
+}
+/* === Toast Notification === */
+#toast {
+  visibility: hidden;
+  background-color: #4BB543;
+  color: white;
+  padding: 10px 16px;
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 5px;
+  font-size: 14px;
+  z-index: 9999;
+}
+body.modal-open {
+  overflow: hidden;
+}
+
+#blur-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(5px);
+  background: rgba(255, 255, 255, 0.5);
+  z-index: 999;
+  display: none;
+}
+
+/* === Canva Card Modal === */
+#summaryPreview {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  max-width: 95%;
+  width: 90%;
+  max-height: 90%;
+  overflow-y: auto;
+  display: none;
+}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="navbar">
+      <div class="logo">
+        <a href="Index.html"><img style="border-radius: 100px;" src="images/cindy logo-01.png" width="100" height="100"></a>
+      </div>
+      <nav>
+        <ul id="MenuItems">
+          <li><a href="Index.html">Home</a></li>
+          <li><a href="product details.html">Women</a></li>
+          <li><a href="#">Kids</a></li>
+          <li><a href="order-history.html">Order History</a></li>
+          <li><a href="contact.html">Contact Us</a></li>
+        </ul>
+      </nav>
+      <a href="cart.html"><img src="images/shopping-cart.png" width="15" height="20" style="margin-left: 20px;"></a>
+      <img src="images/menu.jfif" class="menu-icon" onclick="menutoggle()">
+    </div>
+  </div>
+
+  <div class="checkout-container">
+    <h2>Checkout</h2>
+    <form id="checkout-form" class="checkout-form">
+      <input type="text" id="name" placeholder="Full Name" required>
+      <input type="tel" id="phone" placeholder="Phone Number" required>
+      <input type="text" id="county" placeholder="County" required>
+      <input type="text" id="estate" placeholder="Estate" required>
+      <input type="text" id="landmark" placeholder="Nearby Landmark" required>
+      <select id="payment" required>
+        <option value="">Select Payment Method</option>
+        <option value="M-Pesa on Delivery">M-Pesa</option>
+        <option value="Card on Delivery">Card</option>
+      </select>
+      <button type="submit" class="checkout-form button">Place Order</button>
+    </form>
+
+    <div class="cart-summary" id="cart-summary">
+      <h3>Order Preview</h3>
+      <div id="cart-items"></div>
+      <div class="total-section"><span>Subtotal</span><span id="subtotal">KES 0</span></div>
+      <div class="total-section"><span>Delivery Fee</span><span>KES 200</span></div>
+      <div class="total-section"><strong>Total</strong><strong id="total">KES 0</strong></div>
+    </div>
+  </div>
+
+  <div id="blur-overlay"></div>
+  <div id="summaryPreview">
+    <h3 style="text-align:center;">Here's a preview of your order:</h3>
+    <p style="font-size: 14px; color: #555;">
+      📥 Please download your order summary — this helps us confirm your exact items before delivery.
+    </p>
+    <div id="checkout-box">
+      <h4>Customer Info</h4>
+      <p id="previewName"></p>
+      <p id="previewPhone"></p>
+      <p id="previewAddress"></p>
+      <p id="previewPayment"></p>
+      <div id="previewItems"></div>
+      <p id="previewTotal" style="margin-top: 10px;"></p>
+    </div>
+    <div class="canvas-btns">
+      <button class="btn-download" onclick="downloadCanvas()">Download Order Summary</button>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+
+  <script>
+    function menutoggle() {
+      const menu = document.getElementById("MenuItems");
+      if (menu.style.maxHeight === "0px") {
+        menu.style.maxHeight = "500px";
+      } else {
+        menu.style.maxHeight = "0px";
+      }
+    }
+
+    function getCartData() {
+      const fromCart = sessionStorage.getItem("fromCart");
+      if (fromCart === "true") {
+        localStorage.removeItem("buyNowItem");
+        return JSON.parse(localStorage.getItem("cart")) || [];
+      }
+      const buyNowItem = JSON.parse(localStorage.getItem("buyNowItem"));
+      return buyNowItem ? [buyNowItem] : [];
+    }
+
+    function renderOrder() {
+      const cartItems = document.getElementById("cart-items");
+      const subtotalEl = document.getElementById("subtotal");
+      const totalEl = document.getElementById("total");
+      const items = getCartData();
+
+      let subtotal = 0;
+      cartItems.innerHTML = "";
+
+      items.forEach(item => {
+        const itemTotal = item.price * item.quantity;
+        subtotal += itemTotal;
+        const div = document.createElement("div");
+        div.classList.add("cart-summary-item");
+        div.innerHTML = `
+          <img src="${item.image}" alt="${item.name}" style="width:80px">
+          <div>
+            <p><strong>${item.name}</strong></p>
+            <p>Size: ${item.size}</p>
+            <p>Qty: ${item.quantity}</p>
+            <p>Price: KES ${item.price}</p>
+          </div>
+        `;
+        cartItems.appendChild(div);
+      });
+
+      subtotalEl.textContent = `KES ${subtotal}`;
+      totalEl.textContent = `KES ${subtotal + 200}`;
+    }
+
+    function prepareOrder(e) {
+      e.preventDefault();
+
+      const name = document.getElementById("name").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+      const county = document.getElementById("county").value.trim();
+      const estate = document.getElementById("estate").value.trim();
+      const landmark = document.getElementById("landmark").value.trim();
+      const payment = document.getElementById("payment").value;
+
+      const cart = getCartData();
+      const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      const total = subtotal + 200;
+
+      const customer = { name, phone, county, estate, landmark, payment };
+      localStorage.setItem("customerInfo", JSON.stringify(customer));
+      localStorage.setItem("orderedItems", JSON.stringify(cart));
+      localStorage.setItem("finalSubtotal", subtotal);
+      localStorage.setItem("finalTotal", total);
+
+      document.getElementById("previewName").textContent = `Name: ${name}`;
+      document.getElementById("previewPhone").textContent = `Phone: ${phone}`;
+      document.getElementById("previewAddress").textContent = `Location: ${estate}, ${landmark}, ${county}`;
+      document.getElementById("previewPayment").textContent = `Payment: ${payment}`;
+      document.getElementById("previewTotal").textContent = `Total: KES ${total}`;
+
+      const previewItems = document.getElementById("previewItems");
+      previewItems.innerHTML = "";
+      cart.forEach(item => {
+        const div = document.createElement("div");
+        div.innerHTML = `
+          <img src="${item.image}" width="100" style="border-radius:8px;"><br>
+          ${item.name}<br>Qty: ${item.quantity}<br>Size: ${item.size}
+        `;
+        div.style.textAlign = "center";
+        previewItems.appendChild(div);
+      });
+
+      document.getElementById("summaryPreview").style.display = "block";
+      document.getElementById("blur-overlay").style.display = "block";
+      document.body.classList.add("modal-open");
+    }
+
+    function downloadCanvas() {
+      const customer = JSON.parse(localStorage.getItem("customerInfo"));
+      const total = localStorage.getItem("finalTotal");
+      const cart = getCartData();
+
+      html2canvas(document.getElementById("checkout-box")).then(canvas => {
+        canvas.id = "summaryCanvas";
+        document.getElementById("summaryPreview").appendChild(canvas);
+
+        const link = document.createElement("a");
+        link.download = `order_summary_${Date.now()}.png`;
+        link.href = canvas.toDataURL();
+        link.click();
+
+        showToast("✅ Order summary downloaded!");
+
+        let history = JSON.parse(localStorage.getItem("orderHistory")) || [];
+        history.push({
+          date: new Date().toLocaleString(),
+          customer,
+          items: cart,
+          total
+        });
+        localStorage.setItem("orderHistory", JSON.stringify(history));
+
+        const message = `Hello Cindy Wear,%0aI just placed an order:%0a- Name: ${customer.name}%0a- Phone: ${customer.phone}%0a- Location: ${customer.estate}, ${customer.landmark}, ${customer.county}%0a- Payment: ${customer.payment}%0a- Total: KES ${total}%0a%0a✅ Please attach the downloaded summary image and send. Thank you!`;
+
+        setTimeout(() => {
+          window.location.href = `https://wa.me/254716629203?text=${message}`;
+          localStorage.removeItem("cart");
+          localStorage.removeItem("buyNowItem");
+          sessionStorage.removeItem("fromCart");
+        }, 1000);
+      });
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.style.visibility = "visible";
+      setTimeout(() => {
+        toast.style.visibility = "hidden";
+      }, 3000);
+    }
+
+    document.getElementById("checkout-form").addEventListener("submit", prepareOrder);
+    window.addEventListener("DOMContentLoaded", renderOrder);
+  </script>
+</body>
+</html>

@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+      <title>Contact Us - Cindy Wear</title>
+      <link rel="stylesheet" href="style.css"/>
+      <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet"/>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+<div class="container">
+    <div class="navbar">
+      <div class="logo">
+          <a href="Index.html"><img style="border-radius: 100px;" src="images/cindy logo-01.png" width="100px" height="100px"></a>
+      </div>
+      <nav>
+         <ul id="MenuItems">
+               <li><a href="Index.html">Home</a></li>
+                <li><a href="product details.html">Women</a></li>
+               <li><a href="#">kids</a></li>
+               <li><a href="order-history.html">Order History</a></li>
+               <li><a href="contact.html">Contact Us</a></li>
+         </ul>
+      </nav>
+         <a href="cart.html"><img src="images/shopping-cart.png" width="15px" height="20px" style="margin-left: 20px;"></a>        
+         <img src="images/menu.jfif" class="menu-icon" onclick="menutoggle()">  
+    </div> 
+  </div>
+  <div class="container">
+      <div class="cart-page">
+    <h2>Your Cart</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Quantity</th>
+          <th>Subtotal</th>
+        </tr>
+      </thead>
+      <tbody id="cart-table-body"></tbody>
+    </table>
+
+    <div class="total-price">
+     <table>
+       <tr>
+           <td>Subtotal</td>
+           <td id="cart-subtotal">KES 0</td>
+       </tr>
+       <tr>
+           <td>Delivery Fee</td>
+           <td>KES 200</td>
+       </tr>
+       <tr>
+           <td><strong>Total</strong></td>
+           <td id="cart-total"><strong>KES 0</strong></td>
+       </tr>
+     </table>
+   </div>
+   <p id="empty-cart-msg" style="display:none; text-align:center; margin-top:20px; color:#888; font-size:18px;">
+  🛒 Your cart is empty.
+</p>
+
+<div id="toast" style="
+  visibility:hidden;
+  min-width:250px;
+  background-color:#333;
+  color:#fff;
+  text-align:center;
+  border-radius:6px;
+  padding:12px;
+  position:fixed;
+  z-index:1;
+  left:50%;
+  bottom:30px;
+  transform:translateX(-50%);
+  font-size:14px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.2);
+">
+  ✅ Item removed
+</div>
+
+    <button class="checkout-btn" onclick="goToCheckout()">Proceed to Checkout</button>
+  </div>
+  </div>
+
+  <!------------------------------------------- Footer ---------------------------------------------->
+  <div class="footer">
+    <div class="container">
+      <div class="footer-logo">
+        <a href="Index.html">
+          <img style="border-radius: 100px;" src="images/cindy logo-01.png" width="100px" height="100px">
+        </a>
+        <p>Cindy Wear</p>
+      </div>
+      <div class="footer-row">
+        <div class="footer-col6">
+          <h3>MISSION</h3>
+          <p>
+            To provide stylish, affordable, and high-quality <br />
+            fashion Empowers individuals to express their <br />
+            unique identity with confidence. We aim to create <br />
+            an inclusive shopping experience that values diversity, <br />
+            promotes sustainability, and inspires everyday style choices.
+          </p>
+        </div>
+        <div class="footer-col6">
+          <h3>Useful Links</h3>
+          <ul>
+            <li><a href="contact.html" style="text-decoration: none; color: inherit;">Contact Us</a></li>
+            <li>Blog Post</li>
+            <li>Return Policy</li>                      
+          </ul>
+        </div>
+        <div class="footer-col6">
+          <h3>Follow Us</h3>
+          <ul class="social-icons">
+            <li><a href="https://wa.me/254716629203" target="_blank"><i class="fab fa-whatsapp"></i></a></li>
+            <li><a href="#"><i class="fab fa-tiktok"></i></a></li>                      
+            <li><a href="#" class="instagram-icon"><i class="fab fa-instagram"></i></a></li>                      
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2025 Cindy Wear. All Rights Reserved.</p>
+      <p><a href="#">Privacy Policy</a> | <a href="#">Terms & Conditions</a></p>  
+    </div>
+  </div>
+
+  <!--------------------------------------- Toggle Menu JS ------------------------------------->
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const MenuItems = document.getElementById("MenuItems");
+      const menuIcon = document.querySelector(".menu-icon");
+
+      if (window.innerWidth <= 800) {
+        MenuItems.style.maxHeight = "0px";
+      } else {
+        MenuItems.style.maxHeight = "none";
+      }
+
+      menuIcon.addEventListener("click", function () {
+        if (window.innerWidth <= 800) {
+          MenuItems.style.maxHeight = (MenuItems.style.maxHeight === "0px") ? "500px" : "0px";
+        }
+      });
+
+      window.addEventListener("resize", function () {
+        MenuItems.style.maxHeight = (window.innerWidth > 800) ? "none" : "0px";
+      });
+    });
+  </script>
+  <!--------------------------------------- JS for cart lorgic ------------------------------------->
+ <script>
+  function loadCart() {
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const tbody = document.getElementById("cart-table-body");
+    const totalBox = document.getElementById("cart-total");
+    const subtotalBox = document.getElementById("cart-subtotal");
+    const checkoutBtn = document.querySelector(".checkout-btn");
+    const emptyMsg = document.getElementById("empty-cart-msg");
+
+    let total = 0;
+    tbody.innerHTML = "";
+
+    if (cart.length === 0) {
+      emptyMsg.style.display = "block";
+      checkoutBtn.disabled = true;
+      checkoutBtn.style.backgroundColor = "#ccc";
+      checkoutBtn.style.cursor = "not-allowed";
+      totalBox.textContent = "KES 0";
+      if (subtotalBox) subtotalBox.textContent = "KES 0";
+      return;
+    }
+
+    emptyMsg.style.display = "none";
+    checkoutBtn.disabled = false;
+    checkoutBtn.style.backgroundColor = "#111111";
+    checkoutBtn.style.cursor = "pointer";
+
+    cart.forEach((item, index) => {
+      const subtotal = item.price * item.quantity;
+      total += subtotal;
+
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>
+          <div class="cart-info">
+            <img src="${item.image}" alt="${item.name}" style="width:100px; height:100px; object-fit:cover; margin-right:10px;">
+            <div>
+              <p>${item.name}</p>
+              <small>Price: KES ${item.price}</small><br>
+              <small>Size: ${item.size}</small><br>
+              <button class="remove-btn" onclick="removeItem(${index})">Remove</button>
+            </div>
+          </div>
+        </td>
+        <td><input type="number" value="${item.quantity}" min="1" onchange="updateQuantity(${index}, this.value)"></td>
+        <td>KES ${subtotal}</td>
+      `;
+      tbody.appendChild(row);
+    });
+
+    const finalTotal = total + 200;
+    totalBox.textContent = `KES ${finalTotal}`;
+    if (subtotalBox) subtotalBox.textContent = `KES ${total}`;
+  }
+
+  function updateQuantity(index, newQty) {
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    cart[index].quantity = parseInt(newQty);
+    localStorage.setItem("cart", JSON.stringify(cart));
+    loadCart();
+  }
+
+  function removeItem(index) {
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    cart.splice(index, 1);
+    localStorage.setItem("cart", JSON.stringify(cart));
+    loadCart();
+    showToast("✅ Item removed");
+  }
+
+  function showToast(message) {
+    const toast = document.getElementById("toast");
+    toast.textContent = message;
+    toast.style.visibility = "visible";
+    setTimeout(() => {
+      toast.style.visibility = "hidden";
+    }, 2000);
+  }
+
+  function goToCheckout() {
+    localStorage.removeItem("buyNowItem");           // ✅ Clear previous buyNow item
+    sessionStorage.setItem("fromCart", "true");      // ✅ Flag we came from cart
+    if (document.querySelector(".checkout-btn").disabled) return;
+    window.location.href = "checkout.html";
+  }
+
+  document.addEventListener("DOMContentLoaded", loadCart);
+</script>
+
+</body>
+</html>
